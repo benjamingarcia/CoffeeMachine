@@ -35,20 +35,30 @@ public class CoffeeMachine {
 
     /**
      *
+     *
+     *
      * @param order an coffee machine order
+     * @param checker to verify if beverage missing
+     * @param emailNotifier same as class name : an email notifier
      * @return order translate for machine
      */
-    public static String TransformOrder(Order order) {
+    public static String TransformOrder(Order order, BeverageQuantityChecker checker, EmailNotifier emailNotifier) {
 
-        int diff = price.get(order.getDrink())-order.getMoney();
-        if(diff<=0){
-            int current = receipts.get(order.getDrink());
-            receipts.put(order.getDrink(), current+1);
-            return order.getDrink()+getHotValue(order.isExtraHot(), order.getDrink())
-                    +":"+getSugarValue(order.getSugar())+":"+getStickValue(order.isStick());
+
+        if(checker.isEmpty(order.getDrink().name())){
+            int diff = price.get(order.getDrink())-order.getMoney();
+            if(diff<=0){
+                int current = receipts.get(order.getDrink());
+                receipts.put(order.getDrink(), current+1);
+                return order.getDrink()+getHotValue(order.isExtraHot(), order.getDrink())
+                        +":"+getSugarValue(order.getSugar())+":"+getStickValue(order.isStick());
+            }else{
+                return "M:Miss "+diff+" cents.";
+
+            }
         }else{
-            return "M:Miss "+diff+" cents.";
-
+             emailNotifier.notifyMissingDrink(order.getDrink().name());
+            return "M:No more liquid";
         }
     }
 
